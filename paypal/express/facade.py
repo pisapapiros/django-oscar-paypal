@@ -24,7 +24,7 @@ def _get_payment_action():
 
 def get_paypal_url(basket, shipping_methods, user=None, shipping_address=None,
                    shipping_method=None, host=None, scheme=None,
-                   paypal_params=None):
+                   paypal_params=None, request=None):
     """
     Return the URL for a PayPal Express transaction.
 
@@ -83,22 +83,23 @@ def get_paypal_url(basket, shipping_methods, user=None, shipping_address=None,
                    user=user,
                    user_address=address,
                    no_shipping=no_shipping,
-                   paypal_params=paypal_params)
+                   paypal_params=paypal_params,
+                   request=request)
 
 
-def fetch_transaction_details(token):
+def fetch_transaction_details(token, request=None):
     """
     Fetch the completed details about the PayPal transaction.
     """
-    return get_txn(token)
+    return get_txn(token, request=request)
 
 
-def confirm_transaction(payer_id, token, amount, currency):
+def confirm_transaction(payer_id, token, amount, currency, request=None):
     """
     Confirm the payment action.
     """
     return do_txn(payer_id, token, amount, currency,
-                  action=_get_payment_action())
+                  action=_get_payment_action(), request=request)
 
 
 def refund_transaction(token, amount, currency, note=None):

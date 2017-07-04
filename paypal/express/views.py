@@ -139,7 +139,7 @@ class RedirectView(CheckoutSessionMixin, RedirectView):
 
         params['paypal_params'] = self._get_paypal_params()
 
-        return get_paypal_url(**params)
+        return get_paypal_url(**params, request=self.request)
 
     def _get_paypal_params(self):
         """
@@ -193,7 +193,7 @@ class SuccessResponseView(PaymentDetailsView):
             return HttpResponseRedirect(reverse('basket:summary'))
 
         try:
-            self.txn = fetch_transaction_details(self.token)
+            self.txn = fetch_transaction_details(self.token, request=request)
         except PayPalError as e:
             logger.warning(
                 "Unable to fetch transaction details for token %s: %s",
@@ -272,7 +272,7 @@ class SuccessResponseView(PaymentDetailsView):
             return HttpResponseRedirect(reverse('basket:summary'))
 
         try:
-            self.txn = fetch_transaction_details(self.token)
+            self.txn = fetch_transaction_details(self.token, request=request)
         except PayPalError:
             # Unable to fetch txn details from PayPal - we have to bail out
             messages.error(self.request, error_msg)
@@ -306,7 +306,7 @@ class SuccessResponseView(PaymentDetailsView):
         try:
             confirm_txn = confirm_transaction(
                 kwargs['payer_id'], kwargs['token'], kwargs['txn'].amount,
-                kwargs['txn'].currency)
+                kwargs['txn'].currency, request=self.request)
         except PayPalError:
             raise UnableToTakePayment()
         if not confirm_txn.is_successful:

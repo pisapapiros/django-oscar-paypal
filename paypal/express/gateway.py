@@ -42,7 +42,7 @@ def _format_currency(amt):
     return amt.quantize(D('0.01'))
 
 
-def _fetch_response(method, extra_params):
+def _fetch_response(method, extra_params, request=None):
     """
     Fetch the response from PayPal and return a transaction object
     """
@@ -115,7 +115,7 @@ def _fetch_response(method, extra_params):
 
 def set_txn(basket, shipping_methods, currency, return_url, cancel_url, update_url=None,
             action=SALE, user=None, user_address=None, shipping_method=None,
-            shipping_address=None, no_shipping=False, paypal_params=None):
+            shipping_address=None, no_shipping=False, paypal_params=None, request=None):
     """
     Register the transaction with PayPal to get a token which we use in the
     redirect URL.  This is the 'SetExpressCheckout' from their documentation.
@@ -337,7 +337,7 @@ def set_txn(basket, shipping_methods, currency, return_url, cancel_url, update_u
     params['PAYMENTREQUEST_0_AMT'] = _format_currency(
         params['PAYMENTREQUEST_0_AMT'])
 
-    txn = _fetch_response(SET_EXPRESS_CHECKOUT, params)
+    txn = _fetch_response(SET_EXPRESS_CHECKOUT, params, request=request)
 
     # Construct return URL
     if getattr(settings, 'PAYPAL_SANDBOX_MODE', True):
@@ -349,15 +349,15 @@ def set_txn(basket, shipping_methods, currency, return_url, cancel_url, update_u
     return '%s?%s' % (url, urlencode(params))
 
 
-def get_txn(token):
+def get_txn(token, request=None):
     """
     Fetch details of a transaction from PayPal using the token as
     an identifier.
     """
-    return _fetch_response(GET_EXPRESS_CHECKOUT, {'TOKEN': token})
+    return _fetch_response(GET_EXPRESS_CHECKOUT, {'TOKEN': token}, request=request)
 
 
-def do_txn(payer_id, token, amount, currency, action=SALE):
+def do_txn(payer_id, token, amount, currency, action=SALE, request=None):
     """
     DoExpressCheckoutPayment
     """
@@ -368,7 +368,7 @@ def do_txn(payer_id, token, amount, currency, action=SALE):
         'PAYMENTREQUEST_0_CURRENCYCODE': currency,
         'PAYMENTREQUEST_0_PAYMENTACTION': action,
     }
-    return _fetch_response(DO_EXPRESS_CHECKOUT, params)
+    return _fetch_response(DO_EXPRESS_CHECKOUT, params, request=request)
 
 
 def do_capture(txn_id, amount, currency, complete_type='Complete',
