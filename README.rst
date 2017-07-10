@@ -58,6 +58,10 @@ Tests
 Changelog
 ---------
 
+0.9.8 (released July 10th, 2017)
+-----------------------------------
+* PayPal Express Checkout under Django 1.10 compatibility fix.
+
 0.9.7 (released January 12th, 2016)
 -----------------------------------
 * Fix breakage when using Oscar's ``DeferredTaxMixin``. `#98`_ `#121`_
