@@ -139,7 +139,7 @@ class RedirectView(CheckoutSessionMixin, RedirectView):
 
         params['paypal_params'] = self._get_paypal_params()
 
-        return get_paypal_url(**params, request=self.request)
+        return get_paypal_url(**params)
 
     def _get_paypal_params(self):
         """
